@@ -14,14 +14,15 @@ public class AppStatusEventsListenerImpl implements AppStatusEventsListener {
 
   private final String TAG = "AppStatusEventsListener";
   private final Context context;
-  private ForegroundTasksManager foregroundTasksManager;
+  private final ForegroundTasksManager foregroundTasksManager;
 
-  public AppStatusEventsListenerImpl(Context context) {
+  public AppStatusEventsListenerImpl(Context context, ForegroundTasksManager foregroundTasksManager) {
     this.context = context;
+    this.foregroundTasksManager = foregroundTasksManager;
   }
 
   public void setForegroundTasksManager(ForegroundTasksManager foregroundTasksManager) {
-    this.foregroundTasksManager = foregroundTasksManager;
+    //this.foregroundTasksManager = foregroundTasksManager;
   }
 
   @Override public void onBackgroundStart() {
@@ -35,7 +36,7 @@ public class AppStatusEventsListenerImpl implements AppStatusEventsListener {
   }
 
   private void startServices() {
-    Intent intent= new Intent(context.getApplicationContext(), MyAppService.class);
+    Intent intent= new Intent(context.getApplicationContext(), OrchextraBackgroundService.class);
     context.getApplicationContext().startService(intent);
   }
 
@@ -53,7 +54,7 @@ public class AppStatusEventsListenerImpl implements AppStatusEventsListener {
   @Override public void onServiceRecreated() {}
 
   private void stopServices() {
-    Intent intent= new Intent(context.getApplicationContext(), MyAppService.class);
+    Intent intent= new Intent(context.getApplicationContext(), OrchextraBackgroundService.class);
     context.stopService(intent);
   }
 

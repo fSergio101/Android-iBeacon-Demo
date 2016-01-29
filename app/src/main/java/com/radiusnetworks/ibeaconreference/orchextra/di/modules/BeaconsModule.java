@@ -52,9 +52,10 @@ public class BeaconsModule {
   }
 
   @Provides @Singleton BeaconScanner provideBeaconScanner(RegionMonitoringScanner regionMonitoringScanner,
-      BeaconRangingScanner beaconRangingScanner, AppRunningMode appRunningMode){
+      BeaconRangingScanner beaconRangingScanner, AppRunningMode appRunningMode, BeaconManager beaconManager){
 
-    return new BeaconScannerImpl(regionMonitoringScanner, beaconRangingScanner, appRunningMode);
+    return new BeaconScannerImpl(regionMonitoringScanner, beaconRangingScanner, beaconManager,
+        appRunningMode);
   }
 
   @Provides @Singleton BeaconRangingScanner provideBeaconRangingScanner(BeaconManager beaconManager){

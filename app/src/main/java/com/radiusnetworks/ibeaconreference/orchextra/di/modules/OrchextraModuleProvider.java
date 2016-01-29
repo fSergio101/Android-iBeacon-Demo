@@ -1,7 +1,7 @@
 package com.radiusnetworks.ibeaconreference.orchextra.di.modules;
 
 import com.radiusnetworks.ibeaconreference.lifecycle.AppRunningMode;
-import com.radiusnetworks.ibeaconreference.lifecycle.AppStatusEventsListener;
+//import com.radiusnetworks.ibeaconreference.lifecycle.AppStatusEventsListener;
 import com.radiusnetworks.ibeaconreference.lifecycle.ContextProvider;
 import com.radiusnetworks.ibeaconreference.lifecycle.OrchextraActivityLifecycle;
 
@@ -12,6 +12,6 @@ import com.radiusnetworks.ibeaconreference.lifecycle.OrchextraActivityLifecycle;
 public interface OrchextraModuleProvider {
   AppRunningMode provideAppRunningModeType();
   ContextProvider provideContextProvider();
-  AppStatusEventsListener provideAppStatusEventsListener();
+  //AppStatusEventsListener provideAppStatusEventsListener();
   OrchextraActivityLifecycle provideOrchextraActivityLifecycle();
 }

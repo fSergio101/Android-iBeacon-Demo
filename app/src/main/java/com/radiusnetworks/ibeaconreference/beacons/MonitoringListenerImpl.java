@@ -36,16 +36,16 @@ public class MonitoringListenerImpl implements MonitoringListener {
 
     if (appRunningMode.getRunningModeType() == AppRunningModeType.FOREGROUND){
 
-      beaconRangingScanner.initRangingScanForDetectedRegion(appRunningMode.getRunningModeType(),
-          regions, BackgroundBeaconsRangingTimeType.INFINITE);
+      beaconRangingScanner.initRangingScanForDetectedRegion(regions,
+          BackgroundBeaconsRangingTimeType.INFINITE);
 
       Log.v(TAG, "LOG :: Ranging will be Started with infinite duration");
 
     }else if (appRunningMode.getRunningModeType() == AppRunningModeType.BACKGROUND &&
         backgroundBeaconsRangingTimeType != BackgroundBeaconsRangingTimeType.DISABLED){
 
-      beaconRangingScanner.initRangingScanForDetectedRegion(appRunningMode.getRunningModeType(),
-          regions, backgroundBeaconsRangingTimeType);
+      beaconRangingScanner.initRangingScanForDetectedRegion(regions,
+          backgroundBeaconsRangingTimeType);
 
       Log.v(TAG, "LOG :: Ranging will be Started with " +
           String.valueOf(backgroundBeaconsRangingTimeType.getIntValue()) + " duration");

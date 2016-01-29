@@ -13,11 +13,13 @@ import org.altbeacon.beacon.Region;
 public interface BeaconRangingScanner extends RegionsProviderListener {
 
   void initRangingScanForAllKnownRegions(AppRunningModeType appRunningModeType);
-  void initRangingScanForDetectedRegion(AppRunningModeType appRunningModeType, List<Region> regions,
+  void initRangingScanForDetectedRegion(List<Region> regions,
       BackgroundBeaconsRangingTimeType backgroundBeaconsRangingTimeType);
 
-  void stopRangingScanAllKnownRegions();
+  void stopAllCurrentRangingScannedRegions();
   void stopRangingScanForDetectedRegion(Region region);
 
   BackgroundBeaconsRangingTimeType getBackgroundBeaconsRangingTimeType();
+
+  boolean isRanging();
 }

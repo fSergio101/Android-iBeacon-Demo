@@ -1,10 +1,9 @@
 package com.radiusnetworks.ibeaconreference.orchextra.di.injector;
 
-import com.radiusnetworks.ibeaconreference.orchextra.Orchextra;
 import com.radiusnetworks.ibeaconreference.orchextra.di.components.DaggerServiceComponent;
 import com.radiusnetworks.ibeaconreference.orchextra.di.components.OrchextraComponent;
 import com.radiusnetworks.ibeaconreference.orchextra.di.components.ServiceComponent;
-import com.radiusnetworks.ibeaconreference.service.MyAppService;
+import com.radiusnetworks.ibeaconreference.service.OrchextraBackgroundService;
 
 /**
  * Created by Sergio Martinez Rodriguez
@@ -18,7 +17,7 @@ public class InjectorImpl implements Injector{
     this.orchextraComponent = orchextraComponent;
   }
 
-  @Override public ServiceComponent injectServiceComponent(MyAppService myAppService) {
+  @Override public ServiceComponent injectServiceComponent(OrchextraBackgroundService myAppService) {
     ServiceComponent serviceComponent = DaggerServiceComponent.builder().
         orchextraComponent(orchextraComponent).build();
     serviceComponent.injectOrchextraService(myAppService);

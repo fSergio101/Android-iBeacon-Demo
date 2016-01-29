@@ -3,8 +3,10 @@ package com.radiusnetworks.ibeaconreference.orchextra.di.modules;
 import android.content.Context;
 import com.radiusnetworks.ibeaconreference.beacons.BeaconScanner;
 import com.radiusnetworks.ibeaconreference.lifecycle.AppRunningMode;
+import com.radiusnetworks.ibeaconreference.lifecycle.AppRunningModeImpl;
 import com.radiusnetworks.ibeaconreference.lifecycle.AppStatusEventsListener;
 import com.radiusnetworks.ibeaconreference.lifecycle.ContextProvider;
+import com.radiusnetworks.ibeaconreference.lifecycle.ContextProviderImpl;
 import com.radiusnetworks.ibeaconreference.lifecycle.OrchextraActivityLifecycle;
 import com.radiusnetworks.ibeaconreference.orchextra.ForegroundTasksManager;
 import com.radiusnetworks.ibeaconreference.orchextra.ForegroundTasksManagerImpl;
@@ -27,27 +29,31 @@ public class OrchextraModule {
   }
 
   @Provides
-  @Singleton AppStatusEventsListener provideAppStatusEventsListener(){
-    return new AppStatusEventsListenerImpl(context);
+  @Singleton AppStatusEventsListener provideAppStatusEventsListener(ForegroundTasksManager foregroundTasksManager){
+    AppStatusEventsListener appStatusEventsListener = new AppStatusEventsListenerImpl(context, foregroundTasksManager);
+    return appStatusEventsListener;
   }
 
   @Provides
-  @Singleton OrchextraActivityLifecycle provideOrchextraActivityLifecycle(AppStatusEventsListener appStatusEventsListener) {
-    return new OrchextraActivityLifecycle(context, appStatusEventsListener);
+  @Singleton OrchextraActivityLifecycle provideOrchextraActivityLifecycle(AppRunningMode appRunningMode, ContextProvider contextProvider,
+      AppStatusEventsListener appStatusEventsListener) {
+    OrchextraActivityLifecycle orchextraActivityLifecycle = new OrchextraActivityLifecycle(context, appStatusEventsListener);
+    contextProvider.setOrchextraActivityLifecycle(orchextraActivityLifecycle);
+    appRunningMode.setOrchextraActivityLifecycle(orchextraActivityLifecycle);
+    return orchextraActivityLifecycle;
   }
 
   @Provides
-  @Singleton ContextProvider provideContextProvider(OrchextraActivityLifecycle orchextraActivityLifecycle) {
-    return orchextraActivityLifecycle;
+  @Singleton ContextProvider provideContextProvider() {
+    return new ContextProviderImpl(context.getApplicationContext());
   }
 
-  @Provides @Singleton AppRunningMode provideAppRunningMode(OrchextraActivityLifecycle orchextraActivityLifecycle){
-    return orchextraActivityLifecycle;
+  @Provides @Singleton AppRunningMode provideAppRunningMode(){
+    return new AppRunningModeImpl();
   }
 
-  @Singleton @Provides ForegroundTasksManager provideBackgroundTasksManager(AppStatusEventsListener appStatusEventsListener, BeaconScanner beaconScanner){
+  @Singleton @Provides ForegroundTasksManager provideBackgroundTasksManager(BeaconScanner beaconScanner){
     ForegroundTasksManagerImpl foregroundTasksManager =  new ForegroundTasksManagerImpl(beaconScanner);
-    appStatusEventsListener.setForegroundTasksManager(foregroundTasksManager);
     return foregroundTasksManager;
   }
 

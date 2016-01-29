@@ -16,4 +16,6 @@ public interface ContextProvider {
   Context getApplicationContext();
 
   boolean isApplicationContextAvailable();
+
+  void setOrchextraActivityLifecycle(OrchextraActivityLifecycle orchextraActivityLifecycle);
 }

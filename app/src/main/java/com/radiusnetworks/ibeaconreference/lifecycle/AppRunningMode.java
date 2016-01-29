@@ -7,4 +7,6 @@ package com.radiusnetworks.ibeaconreference.lifecycle;
  */
 public interface AppRunningMode {
   AppRunningModeType getRunningModeType();
+
+  void setOrchextraActivityLifecycle(OrchextraActivityLifecycle orchextraActivityLifecycle);
 }

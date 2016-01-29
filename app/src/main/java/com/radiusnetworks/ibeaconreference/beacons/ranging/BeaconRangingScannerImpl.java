@@ -4,11 +4,12 @@ import android.os.RemoteException;
 import android.util.Log;
 
 import com.radiusnetworks.ibeaconreference.beacons.BackgroundBeaconsRangingTimeType;
-import com.radiusnetworks.ibeaconreference.beacons.ranging.exceptions.BulkRangingScanInBackgroundException;
+import com.radiusnetworks.ibeaconreference.beacons.ranging.exceptions.BulkRangingScannInBackgroundException;
 import com.radiusnetworks.ibeaconreference.beacons.tools.BeaconRegionsFactory;
 import com.radiusnetworks.ibeaconreference.lifecycle.AppRunningModeType;
 
 import java.util.Collection;
+import java.util.Collections;
 import java.util.HashSet;
 import java.util.Iterator;
 import java.util.List;
@@ -32,9 +33,10 @@ public class BeaconRangingScannerImpl implements RangeNotifier, BeaconRangingSca
   private BackgroundBeaconsRangingTimeType backgroundBeaconsRangingTimeType = BackgroundBeaconsRangingTimeType.MAX;
 
   private final BeaconManager beaconManager;
+  private boolean ranging = false;
 
   //avoid possible duplicates in region using set collection
-  private Set<Region> regions = new HashSet<>();
+  private Set<Region> regions = Collections.synchronizedSet((Set) new HashSet<>());
 
   public BeaconRangingScannerImpl(BeaconManager beaconManager) {
     this.beaconManager = beaconManager;
@@ -91,16 +93,14 @@ public class BeaconRangingScannerImpl implements RangeNotifier, BeaconRangingSca
    * @param appRunningModeType current running mode of app AppRunningModeType.BACKGROUND or
    * AppRunningModeType.FOREGROUND
    *
-   * @throws BulkRangingScanInBackgroundException when called on from background
+   * @throws BulkRangingScannInBackgroundException when called on from background
    */
   @Override public void initRangingScanForAllKnownRegions(AppRunningModeType appRunningModeType) {
 
     if (appRunningModeType == AppRunningModeType.BACKGROUND){
-      throw new BulkRangingScanInBackgroundException("initRangingScanForAllKnownRegions "
+      throw new BulkRangingScannInBackgroundException("initRangingScanForAllKnownRegions "
           + "MUST be called only if app is in foreground");
     }
-
-    beaconManager.setBackgroundMode(appRunningModeType == AppRunningModeType.BACKGROUND);
 
     //callback argument into obtainRegionsToScan will call to onRegionsReady
     BeaconRegionsFactory.obtainRegionsToScan(this);
@@ -118,17 +118,14 @@ public class BeaconRangingScannerImpl implements RangeNotifier, BeaconRangingSca
    *
    * End of scanning can be provoked as well when the scanned region exit event is received
    *
-   * @param appRunningModeType current running mode of app AppRunningModeType.BACKGROUND or
    * AppRunningModeType.FOREGROUND
    * @param regions detected region
    * @param backgroundBeaconsRangingTimeType ranging time for scan
    *
-   * @throws BulkRangingScanInBackgroundException when called on from background
+   * @throws BulkRangingScannInBackgroundException when called on from background
    */
-  @Override public void initRangingScanForDetectedRegion(AppRunningModeType appRunningModeType,
-      List<Region> regions, BackgroundBeaconsRangingTimeType backgroundBeaconsRangingTimeType) {
-
-    beaconManager.setBackgroundMode(appRunningModeType == AppRunningModeType.BACKGROUND);
+  @Override public void initRangingScanForDetectedRegion(List<Region> regions,
+      BackgroundBeaconsRangingTimeType backgroundBeaconsRangingTimeType) {
 
     this.regions.addAll(regions);
 
@@ -140,7 +137,7 @@ public class BeaconRangingScannerImpl implements RangeNotifier, BeaconRangingSca
 
       try {
         beaconManager.startRangingBeaconsInRegion(region);
-
+        ranging = true;
         if (backgroundBeaconsRangingTimeType != BackgroundBeaconsRangingTimeType.INFINITE){
           scheduleEndOfRanging(region, backgroundBeaconsRangingTimeType.getIntValue());
         }
@@ -174,7 +171,7 @@ public class BeaconRangingScannerImpl implements RangeNotifier, BeaconRangingSca
   /**
    * This method will terminate the scan over all scanned regions at the moment.
    */
-  @Override public void stopRangingScanAllKnownRegions() {
+  @Override public void stopAllCurrentRangingScannedRegions() {
     stopRangingAllRegions();
   }
 
@@ -196,6 +193,7 @@ public class BeaconRangingScannerImpl implements RangeNotifier, BeaconRangingSca
         e.printStackTrace();
       }
     }
+    ranging = false;
     Log.i("BeaconScannerImpl", "LOG :: Ranging stopped");
   }
 
@@ -213,16 +211,17 @@ public class BeaconRangingScannerImpl implements RangeNotifier, BeaconRangingSca
       e.printStackTrace();
     }
 
-    logAvailableRegions();
+    checkAvailableRegions();
   }
 
-  private void logAvailableRegions() {
+  private void checkAvailableRegions() {
     if (regions.size()>0){
       for (Region region1 : regions){
         Log.i("BeaconScannerImpl", "LOG :: Regions for scanning "+ regions.toString() +": " + region1.getUniqueId());
       }
     }else{
-      Log.i("BeaconScannerImpl", "LOG :: Regions EMPTY: " + regions.toString());
+      ranging = false;
+      Log.i("BeaconScannerImpl", "LOG :: Regions to be ranged EMPTY: " + regions.toString());
     }
   }
 
@@ -235,6 +234,11 @@ public class BeaconRangingScannerImpl implements RangeNotifier, BeaconRangingSca
     }
     return this.backgroundBeaconsRangingTimeType;
   }
+
+  @Override public boolean isRanging() {
+    return ranging;
+  }
+
   // endregion
 
   //endregion

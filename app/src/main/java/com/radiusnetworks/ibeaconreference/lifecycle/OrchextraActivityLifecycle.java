@@ -14,75 +14,23 @@ import java.util.Stack;
  * Created by Sergio Martinez Rodriguez
  * Date 18/1/16.
  */
-public class OrchextraActivityLifecycle implements Application.ActivityLifecycleCallbacks,
-    ContextProvider, AppRunningMode {
+public class OrchextraActivityLifecycle implements Application.ActivityLifecycleCallbacks{
 
   private Stack<ActivityLifecyleWrapper> activityStack = new Stack<>();
   private final Context applicationContext;
   private final AppStatusEventsListener appStatusEventsListener;
 
+
   public OrchextraActivityLifecycle(Context applicationContext,
       AppStatusEventsListener appStatusEventsListener) {
-
     this.applicationContext = applicationContext;
     this.appStatusEventsListener = appStatusEventsListener;
-
   }
+  //
+  //public void setAppStatusEventsListener(AppStatusEventsListener appStatusEventsListener) {
+  //  this.appStatusEventsListener = appStatusEventsListener;
+  //}
 
-  //region context provider interface
-  @Override public Activity getCurrentActivity() {
-
-    Activity activity = lastForegroundActivity();
-
-    if (activity!=null){
-      return activity;
-    }
-
-    activity = lastPausedActivity();
-
-    if (activity!=null){
-      return activity;
-    }
-
-    if (activityStack.size()>0){
-      activity = activityStack.peek().getActivity();
-
-      if (activity!=null){
-        return activity;
-      }
-    }
-
-    return null;
-  }
-
-  @Override public boolean isActivityContextAvailable() {
-    //this implementation gives context of pauses and stopped activities
-    return (applicationContext!=null)? true : false;
-  }
-
-  @Override public Context getApplicationContext() {
-    return applicationContext;
-  }
-
-  @Override public boolean isApplicationContextAvailable() {
-    return (applicationContext!=null)? true : false;
-  }
-
-  //endregion
-
-  //region running Mode interface
-
-  @Override public AppRunningModeType getRunningModeType() {
-    Activity activity = lastPausedActivity();
-
-    if (activity!=null){
-      return AppRunningModeType.FOREGROUND;
-    }else{
-      return AppRunningModeType.BACKGROUND;
-    }
-  }
-
-  //endregion
 
   //region Activity lifecycle Management
 
@@ -108,7 +56,8 @@ public class OrchextraActivityLifecycle implements Application.ActivityLifecycle
   }
 
   private boolean endBackgroundModeIfNeeded() {
-    if (getRunningModeType()==AppRunningModeType.BACKGROUND){
+    //NOTE last paused activity == null means app is in background
+    if (lastPausedActivity() == null){
       appStatusEventsListener.onBackgroundEnd();
       return true;
     }else{
@@ -141,7 +90,8 @@ public class OrchextraActivityLifecycle implements Application.ActivityLifecycle
   }
 
   private void setBackgroundModeIfNeeded() {
-    if (getRunningModeType() == AppRunningModeType.BACKGROUND){
+    //NOTE last paused activity == null means app is in background
+    if (lastPausedActivity() == null){
       appStatusEventsListener.onBackgroundStart();
     }
   }
@@ -171,7 +121,7 @@ public class OrchextraActivityLifecycle implements Application.ActivityLifecycle
     return (i == 1);
   }
 
-  private Activity lastPausedActivity() {
+  public Activity lastPausedActivity() {
     Iterator<ActivityLifecyleWrapper> iter = activityStack.iterator();
 
     while (iter.hasNext()){
@@ -233,6 +183,46 @@ public class OrchextraActivityLifecycle implements Application.ActivityLifecycle
       return true;
     }
     else return false;
+  }
+
+  public AppStatusEventsListener getAppStatusEventsListener() {
+    return appStatusEventsListener;
+  }
+
+  public Activity getCurrentActivity() {
+    Activity activity = lastForegroundActivity();
+
+    if (activity!=null){
+      return activity;
+    }
+
+    activity = lastPausedActivity();
+
+    if (activity!=null){
+      return activity;
+    }
+
+    if (activityStack.size()>0){
+      activity = activityStack.peek().getActivity();
+
+      if (activity!=null){
+        return activity;
+      }
+    }
+
+    return null;
+  }
+
+  public boolean isActivityContextAvailable() {
+    return (applicationContext!=null)? true : false;
+  }
+
+  public Context getApplicationContext() {
+    return applicationContext;
+  }
+
+  public boolean isApplicationContextAvailable() {
+     return (applicationContext!=null)? true : false;
   }
 
   //endregion

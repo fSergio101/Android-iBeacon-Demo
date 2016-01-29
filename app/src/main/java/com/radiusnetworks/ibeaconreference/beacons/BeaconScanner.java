@@ -10,10 +10,10 @@ public interface BeaconScanner {
   void stopMonitoring();
 
   void initRangingScanner();
+  void initAvailableRegionsRangingScanner();
   void stopRangingScanner();
 
   boolean isRanging();
   boolean isMonitoring();
 
-  void switchMonitoringToStandBy();
 }

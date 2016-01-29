@@ -20,7 +20,6 @@ public class BackgroundTasksManagerImpl implements BackgroundTasksManager {
 
   @Override public void finalizeBackgroundTasks() {
     //beaconScanner.stopMonitoring();
-    beaconScanner.switchMonitoringToStandBy();
   }
 
 }

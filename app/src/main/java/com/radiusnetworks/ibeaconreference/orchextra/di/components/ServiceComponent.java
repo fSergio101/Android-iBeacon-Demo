@@ -2,7 +2,7 @@ package com.radiusnetworks.ibeaconreference.orchextra.di.components;
 
 import com.radiusnetworks.ibeaconreference.orchextra.di.modules.BackgroundModule;
 import com.radiusnetworks.ibeaconreference.orchextra.di.scopes.PerService;
-import com.radiusnetworks.ibeaconreference.service.MyAppService;
+import com.radiusnetworks.ibeaconreference.service.OrchextraBackgroundService;
 import dagger.Component;
 
 /**
@@ -11,5 +11,5 @@ import dagger.Component;
  */
 @PerService @Component(dependencies = OrchextraComponent.class, modules = BackgroundModule.class)
 public interface ServiceComponent{
-    void injectOrchextraService(MyAppService myAppService);
+    void injectOrchextraService(OrchextraBackgroundService myAppService);
 }

@@ -16,10 +16,10 @@ public class ForegroundTasksManagerImpl implements  ForegroundTasksManager {
 
   @Override public void startForegroundTasks() {
     beaconScanner.initMonitoring();
+    beaconScanner.initAvailableRegionsRangingScanner();
   }
 
   @Override public void finalizeForegroundTasks() {
     beaconScanner.stopRangingScanner();
-    beaconScanner.switchMonitoringToStandBy();
   }
 }

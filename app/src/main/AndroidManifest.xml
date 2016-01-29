@@ -7,6 +7,8 @@
         android:minSdkVersion="18"
         android:targetSdkVersion="18" />
 
+    <uses-permission android:name="android.permission.RECEIVE_BOOT_COMPLETED"/>
+
     <application
         android:allowBackup="true"
         android:name=".BeaconSampleApp"
@@ -14,6 +16,21 @@
         android:label="@string/app_name"
         android:supportsRtl="true"
         android:theme="@style/AppTheme" >
+
+
+        <receiver android:name=".service.OrchextraBootBroadcastReceiver">
+            <intent-filter>
+                <action android:name="android.intent.action.BOOT_COMPLETED" />
+            </intent-filter>
+        </receiver>
+
+        <service
+            android:name=".service.OrchextraBackgroundService"
+            android:icon="@drawable/ic_launcher"
+            android:label="@string/app_service_name"
+            >
+
+        </service>
 
         <activity
             android:name="com.radiusnetworks.ibeaconreference.MainActivity"
@@ -24,14 +41,6 @@
                 <category android:name="android.intent.category.LAUNCHER" />
             </intent-filter>
         </activity>
-
-        <service
-            android:name=".service.MyAppService"
-            android:icon="@drawable/ic_launcher"
-            android:label="@string/app_service_name"
-            >
-
-        </service>
 
     </application>
 

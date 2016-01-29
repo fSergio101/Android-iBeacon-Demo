@@ -8,6 +8,8 @@ import android.util.Log;
 import com.radiusnetworks.ibeaconreference.beacons.tools.BeaconRegionsFactory;
 import com.radiusnetworks.ibeaconreference.lifecycle.AppRunningModeType;
 import com.radiusnetworks.ibeaconreference.lifecycle.ContextProvider;
+import java.util.ArrayList;
+import java.util.Collections;
 import java.util.List;
 import org.altbeacon.beacon.BeaconConsumer;
 import org.altbeacon.beacon.BeaconManager;
@@ -24,10 +26,13 @@ public class RegionMonitoringScannerImpl implements RegionMonitoringScanner,
   private static final String TAG = "RegionMonitoringScanner";
 
   private final BeaconManager beaconManager;
-  private boolean standBy;
   private final Context context;
-  private List<Region> regions;
   private final MonitoringListener monitoringListener;
+
+  private List<Region> regionsToBeMonitored = Collections.synchronizedList((List) new ArrayList<>());
+  private List<Region> regionsInEnter = Collections.synchronizedList((List) new ArrayList<>());
+
+  private boolean monitoring = false;
 
   public RegionMonitoringScannerImpl(ContextProvider contextProvider, BeaconManager beaconManager,
       MonitoringListener monitoringListener) {
@@ -66,11 +71,13 @@ public class RegionMonitoringScannerImpl implements RegionMonitoringScanner,
     //TODO Notify Beacons EventNofitier
     Log.d(TAG, "LOG :: ENTER BEACON REGION : " + region.getUniqueId());
     monitoringListener.onRegionEnter(region);
+    regionsInEnter.add(region);
   }
 
   @Override public void didExitRegion(Region region) {
     Log.d(TAG, "LOG :: EXIT BEACON REGION : " + region.getUniqueId());
     monitoringListener.onRegionExit(region);
+    regionsInEnter.remove(region);
     //TODO Notify Beacons EventNofitier
   }
 
@@ -80,29 +87,23 @@ public class RegionMonitoringScannerImpl implements RegionMonitoringScanner,
 
   //region RegionMonitoringScanner Interface
 
-  //@Override public void setMonitoringListener(MonitoringListener monitoringListener) {
-  //  this.monitoringListener = monitoringListener;
-  //}
-
   @Override public void initMonitoring(AppRunningModeType appRunningModeType) {
     beaconManager.setBackgroundMode(appRunningModeType == AppRunningModeType.BACKGROUND);
     beaconManager.bind(this);
   }
 
   @Override public void stopMonitoring() {
-    for (Region region:regions){
+    for (Region region: regionsToBeMonitored){
       try {
         beaconManager.stopMonitoringBeaconsInRegion(region);
+        monitoring = false;
         Log.d(TAG, "LOG :: Stop Beacons Monitoring for region: " + region.getUniqueId());
       } catch (RemoteException e) {
         e.printStackTrace();
       }
     }
+    regionsInEnter.removeAll(regionsInEnter);
     beaconManager.unbind(this);
-  }
-
-  @Override public void setStandByMode(boolean mode) {
-    this.standBy = mode;
   }
 
   private void obtainRegionsToScan() {
@@ -110,18 +111,28 @@ public class RegionMonitoringScannerImpl implements RegionMonitoringScanner,
     BeaconRegionsFactory.obtainRegionsToScan(this);
   }
 
+  @Override public boolean isMonitoring() {
+    return monitoring;
+  }
+
   // region RegionsProviderListener Interface
 
   @Override public void onRegionsReady(List<Region> regions) {
-    this.regions = regions;
+    this.regionsToBeMonitored.clear();
+    this.regionsToBeMonitored.addAll(regions);
     for (Region region:regions){
       try {
         beaconManager.startMonitoringBeaconsInRegion(region);
+        monitoring = true;
         Log.d(TAG, "LOG :: Start Beacons Monitoring for region " + region.getUniqueId());
       } catch (RemoteException e) {
         e.printStackTrace();
       }
     }
+  }
+
+  public List<Region> obtainRegionsInRange() {
+    return regionsInEnter;
   }
 
   // endregion
