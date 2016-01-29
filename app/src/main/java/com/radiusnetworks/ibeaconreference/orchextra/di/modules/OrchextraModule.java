@@ -30,8 +30,7 @@ public class OrchextraModule {
 
   @Provides
   @Singleton AppStatusEventsListener provideAppStatusEventsListener(ForegroundTasksManager foregroundTasksManager){
-    AppStatusEventsListener appStatusEventsListener = new AppStatusEventsListenerImpl(context, foregroundTasksManager);
-    return appStatusEventsListener;
+    return new AppStatusEventsListenerImpl(context, foregroundTasksManager);
   }
 
   @Provides
@@ -53,8 +52,7 @@ public class OrchextraModule {
   }
 
   @Singleton @Provides ForegroundTasksManager provideBackgroundTasksManager(BeaconScanner beaconScanner){
-    ForegroundTasksManagerImpl foregroundTasksManager =  new ForegroundTasksManagerImpl(beaconScanner);
-    return foregroundTasksManager;
+    return  new ForegroundTasksManagerImpl(beaconScanner);
   }
 
 }

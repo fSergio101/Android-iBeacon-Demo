@@ -36,7 +36,7 @@ public class BeaconRangingScannerImpl implements RangeNotifier, BeaconRangingSca
   private boolean ranging = false;
 
   //avoid possible duplicates in region using set collection
-  private Set<Region> regions = Collections.synchronizedSet((Set) new HashSet<>());
+  private Set<Region> regions = (Set<Region>) Collections.synchronizedSet(new HashSet<Region>());
 
   public BeaconRangingScannerImpl(BeaconManager beaconManager) {
     this.beaconManager = beaconManager;
@@ -54,8 +54,7 @@ public class BeaconRangingScannerImpl implements RangeNotifier, BeaconRangingSca
     //TODO raise Event beacon Seen
 
     if (collection.size() > 0) {
-      for (Iterator<Beacon> beacons = collection.iterator(); beacons.hasNext();){
-        Beacon beacon = beacons.next();
+      for (Beacon beacon : collection) {
         Log.i("BeaconScannerImpl", "LOG :: Beacon: " + beacon.getId1() + " major id:"
             + beacon.getId2() + "  minor id: " + beacon.getId3());
       }

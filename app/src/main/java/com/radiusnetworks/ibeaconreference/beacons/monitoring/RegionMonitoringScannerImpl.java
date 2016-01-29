@@ -29,8 +29,8 @@ public class RegionMonitoringScannerImpl implements RegionMonitoringScanner,
   private final Context context;
   private final MonitoringListener monitoringListener;
 
-  private List<Region> regionsToBeMonitored = Collections.synchronizedList((List) new ArrayList<>());
-  private List<Region> regionsInEnter = Collections.synchronizedList((List) new ArrayList<>());
+  private List<Region> regionsToBeMonitored = (List<Region>) Collections.synchronizedList(new ArrayList<Region>());
+  private List<Region> regionsInEnter = (List<Region>) Collections.synchronizedList(new ArrayList<Region>());
 
   private boolean monitoring = false;
 
@@ -102,7 +102,7 @@ public class RegionMonitoringScannerImpl implements RegionMonitoringScanner,
         e.printStackTrace();
       }
     }
-    regionsInEnter.removeAll(regionsInEnter);
+    regionsInEnter.clear();
     beaconManager.unbind(this);
   }
 

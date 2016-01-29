@@ -6,6 +6,7 @@ import android.app.Application;
 import android.content.Context;
 import android.os.Build;
 import android.os.Bundle;
+import android.util.Log;
 import java.util.EmptyStackException;
 import java.util.Iterator;
 import java.util.Stack;
@@ -16,21 +17,16 @@ import java.util.Stack;
  */
 public class OrchextraActivityLifecycle implements Application.ActivityLifecycleCallbacks{
 
+  private static final String TAG = "OrchextraActivityLifecycle";
   private Stack<ActivityLifecyleWrapper> activityStack = new Stack<>();
   private final Context applicationContext;
   private final AppStatusEventsListener appStatusEventsListener;
-
 
   public OrchextraActivityLifecycle(Context applicationContext,
       AppStatusEventsListener appStatusEventsListener) {
     this.applicationContext = applicationContext;
     this.appStatusEventsListener = appStatusEventsListener;
   }
-  //
-  //public void setAppStatusEventsListener(AppStatusEventsListener appStatusEventsListener) {
-  //  this.appStatusEventsListener = appStatusEventsListener;
-  //}
-
 
   //region Activity lifecycle Management
 
@@ -47,7 +43,8 @@ public class OrchextraActivityLifecycle implements Application.ActivityLifecycle
       }
       cleanZombieWrappersAtStack();
     } catch (EmptyStackException e) {
-
+      //TODO do something interesting
+      Log.e(TAG,"LOG :: EmptyStackException in activity lifecycle");
     }
   }
 
@@ -122,11 +119,9 @@ public class OrchextraActivityLifecycle implements Application.ActivityLifecycle
   }
 
   public Activity lastPausedActivity() {
-    Iterator<ActivityLifecyleWrapper> iter = activityStack.iterator();
 
-    while (iter.hasNext()){
-      ActivityLifecyleWrapper activityLifecyleWrapper = iter.next();
-      if (!activityLifecyleWrapper.isStopped()){
+    for (ActivityLifecyleWrapper activityLifecyleWrapper : activityStack) {
+      if (!activityLifecyleWrapper.isStopped()) {
         return activityLifecyleWrapper.getActivity();
       }
     }
@@ -135,11 +130,8 @@ public class OrchextraActivityLifecycle implements Application.ActivityLifecycle
 
   private Activity lastForegroundActivity() {
 
-    Iterator<ActivityLifecyleWrapper> iter = activityStack.iterator();
-
-    while (iter.hasNext()){
-      ActivityLifecyleWrapper activityLifecyleWrapper = iter.next();
-      if (!activityLifecyleWrapper.isPaused()){
+    for (ActivityLifecyleWrapper activityLifecyleWrapper : activityStack) {
+      if (!activityLifecyleWrapper.isPaused()) {
         return activityLifecyleWrapper.getActivity();
       }
     }
@@ -171,18 +163,12 @@ public class OrchextraActivityLifecycle implements Application.ActivityLifecycle
   }
 
   private boolean checkActivityDestroyedUnderV17(Activity activity) {
-    if (activity == null || activity.getBaseContext() == null){
-      return true;
-    }
-    else return false;
+    return activity == null || activity.getBaseContext() == null;
   }
 
   @TargetApi(Build.VERSION_CODES.JELLY_BEAN_MR1)
   private boolean checkActivityDestroyedV17(Activity activity) {
-    if (activity == null || activity.isDestroyed()){
-      return true;
-    }
-    else return false;
+    return activity == null || activity.isDestroyed();
   }
 
   public AppStatusEventsListener getAppStatusEventsListener() {
@@ -214,7 +200,7 @@ public class OrchextraActivityLifecycle implements Application.ActivityLifecycle
   }
 
   public boolean isActivityContextAvailable() {
-    return (applicationContext!=null)? true : false;
+    return (applicationContext != null);
   }
 
   public Context getApplicationContext() {
@@ -222,7 +208,7 @@ public class OrchextraActivityLifecycle implements Application.ActivityLifecycle
   }
 
   public boolean isApplicationContextAvailable() {
-     return (applicationContext!=null)? true : false;
+     return (applicationContext != null);
   }
 
   //endregion

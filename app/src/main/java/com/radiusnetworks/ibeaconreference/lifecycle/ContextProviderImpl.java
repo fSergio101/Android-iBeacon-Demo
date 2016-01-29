@@ -45,7 +45,7 @@ public class ContextProviderImpl implements ContextProvider {
   }
 
   @Override public boolean isApplicationContextAvailable() {
-    return (context!=null)? true : false;
+    return (context != null);
   }
 
   //endregion
