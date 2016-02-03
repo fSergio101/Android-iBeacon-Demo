@@ -21,21 +21,23 @@ public class Orchextra {
   @Inject
   OrchextraActivityLifecycle orchextraActivityLifecycle;
 
-  public void initDependencyInjection(Context applicationContext) {
+  public void initDependencyInjection(Context applicationContext,
+      OrchextraCompletionCallback orchextraCompletionCallback) {
    OrchextraComponent orchextraComponent = DaggerOrchextraComponent.builder()
-        .orchextraModule(new OrchextraModule(applicationContext)).build();
+        .orchextraModule(new OrchextraModule(applicationContext, orchextraCompletionCallback))
+       .build();
     injector = new InjectorImpl(orchextraComponent);
     orchextraComponent.injectOrchextra(Orchextra.instance);
   }
 
-  public static synchronized void sdkInitialize(Application application) {
+  public static synchronized void sdkInitialize(Application application, OrchextraCompletionCallback orchextraCompletionCallback) {
     Orchextra.instance = new Orchextra();
-    Orchextra.instance.init(application);
+    Orchextra.instance.init(application, orchextraCompletionCallback);
     Orchextra.instance.start();
   }
 
-  private void init(Application application) {
-    initDependencyInjection(application.getApplicationContext());
+  private void init(Application application, OrchextraCompletionCallback orchextraCompletionCallback) {
+    initDependencyInjection(application.getApplicationContext(), orchextraCompletionCallback);
 
     initLifecyle(application);
 

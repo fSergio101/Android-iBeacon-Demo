@@ -8,14 +8,14 @@ import com.radiusnetworks.ibeaconreference.beacons.BeaconScanner;
  */
 public class BackgroundTasksManagerImpl implements BackgroundTasksManager {
 
-  private BeaconScanner beaconScanner;
+  private final BeaconScanner beaconScanner;
 
   public BackgroundTasksManagerImpl(BeaconScanner beaconScanner) {
     this.beaconScanner = beaconScanner;
   }
 
   @Override public void startBackgroundTasks() {
-    beaconScanner.initMonitoring();
+      beaconScanner.startMonitoring();
   }
 
   @Override public void finalizeBackgroundTasks() {

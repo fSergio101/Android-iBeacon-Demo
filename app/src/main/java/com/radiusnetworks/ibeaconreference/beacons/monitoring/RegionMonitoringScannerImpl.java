@@ -28,6 +28,7 @@ public class RegionMonitoringScannerImpl implements RegionMonitoringScanner,
   private final BeaconManager beaconManager;
   private final Context context;
   private final MonitoringListener monitoringListener;
+  private final BeaconsController beaconsController;
 
   private List<Region> regionsToBeMonitored = (List<Region>) Collections.synchronizedList(new ArrayList<Region>());
   private List<Region> regionsInEnter = (List<Region>) Collections.synchronizedList(new ArrayList<Region>());
@@ -35,9 +36,10 @@ public class RegionMonitoringScannerImpl implements RegionMonitoringScanner,
   private boolean monitoring = false;
 
   public RegionMonitoringScannerImpl(ContextProvider contextProvider, BeaconManager beaconManager,
-      MonitoringListener monitoringListener) {
+      MonitoringListener monitoringListener, BeaconsController beaconsController) {
 
     this.beaconManager = beaconManager;
+    this.beaconsController = beaconsController;
     this.context = contextProvider.getApplicationContext();
     this.monitoringListener = monitoringListener;
 
@@ -47,7 +49,8 @@ public class RegionMonitoringScannerImpl implements RegionMonitoringScanner,
   //region BeaconConsumer Interface
 
   @Override public void onBeaconServiceConnect() {
-    //TODO if Regions are changed service that handles monitoring should restart
+    //TODO if Regions are changed service that handles monitoring should restart ::
+    //TODO @See Observer implementation in BeaconScannerImpl.java
     obtainRegionsToScan();
   }
 
@@ -68,17 +71,19 @@ public class RegionMonitoringScannerImpl implements RegionMonitoringScanner,
   //region MonitorNotifier Interface
 
   @Override public void didEnterRegion(Region region) {
-    //TODO Notify Beacons EventNofitier
-    Log.d(TAG, "LOG :: ENTER BEACON REGION : " + region.getUniqueId());
+    beaconsController.onRegionEnter(region);
     monitoringListener.onRegionEnter(region);
     regionsInEnter.add(region);
+
+    Log.d(TAG, "LOG :: ENTER BEACON REGION : " + region.getUniqueId());
   }
 
   @Override public void didExitRegion(Region region) {
-    Log.d(TAG, "LOG :: EXIT BEACON REGION : " + region.getUniqueId());
+    beaconsController.onRegionExit(region);
     monitoringListener.onRegionExit(region);
     regionsInEnter.remove(region);
-    //TODO Notify Beacons EventNofitier
+
+    Log.d(TAG, "LOG :: EXIT BEACON REGION : " + region.getUniqueId());
   }
 
   @Override public void didDetermineStateForRegion(int i, Region region) {}
@@ -107,7 +112,9 @@ public class RegionMonitoringScannerImpl implements RegionMonitoringScanner,
   }
 
   private void obtainRegionsToScan() {
-    //TODO First get allRegions From BD Later this:
+    beaconsController.getAllRegionsFromDataBase(this);
+
+    //TODO remove this line below when above ready
     BeaconRegionsFactory.obtainRegionsToScan(this);
   }
 

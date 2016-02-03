@@ -15,17 +15,17 @@ import java.util.Stack;
  * Created by Sergio Martinez Rodriguez
  * Date 18/1/16.
  */
+
+//TODO Refactor this class, it is starting to have too many responsibilities separate state
+// from behavior
 public class OrchextraActivityLifecycle implements Application.ActivityLifecycleCallbacks{
 
-  private static final String TAG = "OrchextraActivityLifecycle";
+  private static final String TAG = "OXActivityLifecycle";
   private Stack<ActivityLifecyleWrapper> activityStack = new Stack<>();
-  private final Context applicationContext;
   private final AppStatusEventsListener appStatusEventsListener;
 
-  public OrchextraActivityLifecycle(Context applicationContext,
-      AppStatusEventsListener appStatusEventsListener) {
-    this.applicationContext = applicationContext;
-    this.appStatusEventsListener = appStatusEventsListener;
+  public OrchextraActivityLifecycle(AppStatusEventsListener listener) {
+    this.appStatusEventsListener = listener;
   }
 
   //region Activity lifecycle Management
@@ -87,7 +87,7 @@ public class OrchextraActivityLifecycle implements Application.ActivityLifecycle
   }
 
   private void setBackgroundModeIfNeeded() {
-    //NOTE last paused activity == null means app is in background
+    //Note that when last paused activity is null means app is in background
     if (lastPausedActivity() == null){
       appStatusEventsListener.onBackgroundStart();
     }
@@ -200,15 +200,7 @@ public class OrchextraActivityLifecycle implements Application.ActivityLifecycle
   }
 
   public boolean isActivityContextAvailable() {
-    return (applicationContext != null);
-  }
-
-  public Context getApplicationContext() {
-    return applicationContext;
-  }
-
-  public boolean isApplicationContextAvailable() {
-     return (applicationContext != null);
+    return (getCurrentActivity() != null);
   }
 
   //endregion

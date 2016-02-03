@@ -2,7 +2,10 @@ package com.radiusnetworks.ibeaconreference.orchextra.di.modules;
 
 import com.radiusnetworks.ibeaconreference.beacons.BeaconScanner;
 import com.radiusnetworks.ibeaconreference.beacons.BeaconScannerImpl;
+import com.radiusnetworks.ibeaconreference.beacons.BluetoothAvailability;
+import com.radiusnetworks.ibeaconreference.beacons.BluetoothAvailabilityImpl;
 import com.radiusnetworks.ibeaconreference.beacons.MonitoringListenerImpl;
+import com.radiusnetworks.ibeaconreference.beacons.monitoring.BeaconsController;
 import com.radiusnetworks.ibeaconreference.beacons.monitoring.MonitoringListener;
 import com.radiusnetworks.ibeaconreference.beacons.monitoring.RegionMonitoringScanner;
 import com.radiusnetworks.ibeaconreference.beacons.monitoring.RegionMonitoringScannerImpl;
@@ -10,6 +13,8 @@ import com.radiusnetworks.ibeaconreference.beacons.ranging.BeaconRangingScanner;
 import com.radiusnetworks.ibeaconreference.beacons.ranging.BeaconRangingScannerImpl;
 import com.radiusnetworks.ibeaconreference.lifecycle.AppRunningMode;
 import com.radiusnetworks.ibeaconreference.lifecycle.ContextProvider;
+import com.radiusnetworks.ibeaconreference.orchextra.FeatureListener;
+import com.radiusnetworks.ibeaconreference.permissions.PermissionChecker;
 import dagger.Module;
 import dagger.Provides;
 import javax.inject.Singleton;
@@ -52,24 +57,41 @@ public class BeaconsModule {
   }
 
   @Provides @Singleton BeaconScanner provideBeaconScanner(RegionMonitoringScanner regionMonitoringScanner,
-      BeaconRangingScanner beaconRangingScanner, AppRunningMode appRunningMode, BeaconManager beaconManager){
+      BeaconRangingScanner beaconRangingScanner, AppRunningMode appRunningMode, BeaconManager beaconManager,
+      BluetoothStatusInfo bluetoothStatusInfo){
 
-    return new BeaconScannerImpl(regionMonitoringScanner, beaconRangingScanner, beaconManager,
-        appRunningMode);
+    return new BeaconScannerImpl(regionMonitoringScanner, beaconRangingScanner, beaconManager
+        , bluetoothStatusInfo, appRunningMode);
   }
 
   @Provides @Singleton BeaconRangingScanner provideBeaconRangingScanner(BeaconManager beaconManager){
-    return new BeaconRangingScannerImpl(beaconManager);
+    return new BeaconRangingScannerImpl(beaconManager, beaconsController);
   }
 
   @Provides @Singleton RegionMonitoringScanner provideRegionMonitoringScanner(ContextProvider contextProvider,
-    BeaconManager beaconManager, MonitoringListener monitoringListener){
-    return new RegionMonitoringScannerImpl(contextProvider, beaconManager, monitoringListener);
+    BeaconManager beaconManager, MonitoringListener monitoringListener, BeaconsController beaconsController){
+    return new RegionMonitoringScannerImpl(contextProvider, beaconManager, monitoringListener,
+        beaconsController);
+  }
+
+  @Provides @Singleton BeaconsController provideBeaconsController(){
+    return new BeaconsController(orchextraBeaconMapper, orchextraRegionMapper, actionsScheduler);
   }
 
   @Provides @Singleton MonitoringListener provideMonitoringListener(AppRunningMode appRunningMode,
       BeaconRangingScanner beaconRangingScanner){
     return new MonitoringListenerImpl(appRunningMode, beaconRangingScanner);
+  }
+
+  @Provides @Singleton BluetoothAvailability provideBluetoothAvailability(BeaconManager beaconManager){
+    return new BluetoothAvailabilityImpl(beaconManager);
+  }
+
+  @Provides @Singleton BluetoothStatusInfo provideBluetoothStatusInfo(BluetoothAvailability bluetoothAvailability,
+      PermissionChecker permissionChecker, ContextProvider contextProvider, AppRunningMode appRunningMode,
+      FeatureListener featureListener){
+    return new BluetoothStatusInfoImpl(permissionChecker, bluetoothAvailability, contextProvider,
+        appRunningMode, featureListener);
   }
 
 }

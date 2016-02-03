@@ -4,6 +4,7 @@ import android.os.RemoteException;
 import android.util.Log;
 
 import com.radiusnetworks.ibeaconreference.beacons.BackgroundBeaconsRangingTimeType;
+import com.radiusnetworks.ibeaconreference.beacons.monitoring.BeaconsController;
 import com.radiusnetworks.ibeaconreference.beacons.ranging.exceptions.BulkRangingScannInBackgroundException;
 import com.radiusnetworks.ibeaconreference.beacons.tools.BeaconRegionsFactory;
 import com.radiusnetworks.ibeaconreference.lifecycle.AppRunningModeType;
@@ -28,18 +29,21 @@ public class BeaconRangingScannerImpl implements RangeNotifier, BeaconRangingSca
 
   private static final String TAG = "BeaconRangingScanner";
 
+  //TODO SET OFICIAL TIME USING CONFIG
   //private BackgroundBeaconsRangingTimeType backgroundBeaconsRangingTimeType = BackgroundBeaconsRangingTimeType.DISABLED;
   //private BackgroundBeaconsRangingTimeType backgroundBeaconsRangingTimeType = BackgroundBeaconsRangingTimeType.MIN;
   private BackgroundBeaconsRangingTimeType backgroundBeaconsRangingTimeType = BackgroundBeaconsRangingTimeType.MAX;
-
   private final BeaconManager beaconManager;
+  private final BeaconsController beaconsController;
   private boolean ranging = false;
 
   //avoid possible duplicates in region using set collection
   private Set<Region> regions = (Set<Region>) Collections.synchronizedSet(new HashSet<Region>());
 
-  public BeaconRangingScannerImpl(BeaconManager beaconManager) {
+  public BeaconRangingScannerImpl(BeaconManager beaconManager, BeaconsController beaconsController) {
     this.beaconManager = beaconManager;
+    this.beaconsController = beaconsController;
+
     beaconManager.setRangeNotifier(this);
   }
 
@@ -51,7 +55,7 @@ public class BeaconRangingScannerImpl implements RangeNotifier, BeaconRangingSca
    * @param region region which all the scanned beacons received belongs to
    */
   @Override public void didRangeBeaconsInRegion(Collection<Beacon> collection, Region region) {
-    //TODO raise Event beacon Seen
+    beaconsController.onBeaconsDetectedInRegion(collection, region);
 
     if (collection.size() > 0) {
       for (Beacon beacon : collection) {
@@ -102,6 +106,9 @@ public class BeaconRangingScannerImpl implements RangeNotifier, BeaconRangingSca
     }
 
     //callback argument into obtainRegionsToScan will call to onRegionsReady
+    beaconsController.getAllRegionsFromDataBase(this);
+
+    //TODO remove this line below when above ready
     BeaconRegionsFactory.obtainRegionsToScan(this);
   }
 

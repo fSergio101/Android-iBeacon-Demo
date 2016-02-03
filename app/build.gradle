@@ -42,9 +42,11 @@ dependencies {
   testCompile 'junit:junit:4.12'
 
   compile 'com.google.dagger:dagger:2.0'
+  compile 'com.karumi:dexter:2.1.2'
   apt 'com.google.dagger:dagger-compiler:2.0'
   compile 'org.glassfish:javax.annotation:10.0-b28'
   compile 'com.android.support:appcompat-v7:23.1.0'
   compile 'com.android.support:design:23.1.0'
   compile 'org.altbeacon:android-beacon-library:2+'
+  compile 'com.google.android.gms:play-services-gcm:8.4.0'
 }

@@ -5,6 +5,7 @@ import android.util.Log;
 import com.radiusnetworks.ibeaconreference.lifecycle.ContextProvider;
 import com.radiusnetworks.ibeaconreference.lifecycle.OrchextraActivityLifecycle;
 import com.radiusnetworks.ibeaconreference.orchextra.Orchextra;
+import com.radiusnetworks.ibeaconreference.orchextra.OrchextraCompletionCallback;
 import com.radiusnetworks.ibeaconreference.service.AppStatusEventsListenerImpl;
 import com.radiusnetworks.ibeaconreference.service.BackgroundTasksManager;
 import com.radiusnetworks.ibeaconreference.service.BackgroundTasksManagerImpl;
@@ -16,7 +17,7 @@ import org.altbeacon.beacon.powersave.BackgroundPowerSaver;
  * Created by Sergio Martinez Rodriguez
  * Date 4/1/16.
  */
-public class BeaconSampleApp extends Application{
+public class BeaconSampleApp extends Application implements OrchextraCompletionCallback{
     private static final String TAG = ".MyApplicationName";
 
     //private static BackgroundTasksManager backgroundTasksManager;
@@ -60,8 +61,16 @@ public class BeaconSampleApp extends Application{
       //registerActivityLifecycleCallbacks(orchextraActivityLifecycle);
       //
       //contextProvider = orchextraActivityLifecycle;
-      Orchextra.sdkInitialize(this);
+      Orchextra.sdkInitialize(this, this);
     }
+
+  @Override public void onSuccess() {
+    Log.d(TAG, "LOG :: SUCESS INITIALIZATON");
+  }
+
+  @Override public void onError(String s) {
+    Log.d(TAG, "LOG :: ERROR INITIALIZATION :: \n" + s);
+  }
 
   //public static BackgroundTasksManager getbackgroundTasksManagerInstance() {
   //  if (backgroundTasksManager==null){

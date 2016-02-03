@@ -3,5 +3,17 @@
     <string name="app_name">IBeaconReference</string>
     <string name="app_service_name">My app Service</string>
 
+    <string name="continueRequestPermissionAllowedFeedback">All permissions have been allowed</string>
+    <string name="continueRequestPermissionSettingsDeniedFeedback">SETTINGS</string>
+    <string name="continueRequestPermissionDeniedFeedback">Permissions denied are necessary for doing some tasks</string>
+    <string name="continueRequestPermissionRationaleMessage">Permissions denied are necessary for doing some tasks, allow it!</string>
+    <string name="continueRequestPermissionRationaleTitle">Permission Request</string>
+
+
+    <string name="accessCoarseLocationPermissionAllowedFeedback">Access coarse location has been allowed</string>
+    <string name="accessCoarseLocationPermissionSettingsDeniedFeedback">SETTINGS</string>
+    <string name="accessCoarseLocationPermissionDeniedFeedback">Access coarse location Permission is necessary for using iBeacon proximity technology.</string>
+    <string name="accessCoarseLocationPermissionRationaleMessage">Access coarse location Permission is necessary for using some nice stuff of this app, allow it!</string>
+    <string name="accessCoarseLocationPermissionRationaleTitle">Permission Request</string>
 
 </resources>

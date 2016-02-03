@@ -6,10 +6,10 @@ package com.radiusnetworks.ibeaconreference.beacons;
  */
 public interface BeaconScanner {
 
-  void initMonitoring();
+  void startMonitoring();
   void stopMonitoring();
 
-  void initRangingScanner();
+  void startRangingScanner();
   void initAvailableRegionsRangingScanner();
   void stopRangingScanner();
 
